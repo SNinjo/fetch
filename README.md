@@ -1,4 +1,4 @@
-# JoFetch
+# JoFetch &middot; [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/SNinjo/jo-fetch/blob/main/LICENSE) [![NPM](https://img.shields.io/badge/npm-v1.0.0-blue)](https://www.npmjs.com/package/jo-fetch) [![CI](https://img.shields.io/badge/CI-passing-brightgreen)](https://github.com/SNinjo/jo-fetch/actions/workflows/ci.yml)
 JoFetch is a JavaScript tool that provides enhanced fetch functionality.
 
 There are a lot of functions in this tool, such as simple or integration version.
@@ -53,4 +53,4 @@ The parameters, url and param, are same as window.fetch.
 | fetchAutoRetry(url, param, times, delay) | Promise     | Return the result, and if the fetch fails, automatically retry to fetch within a limited number of times. |
 
 ## License
-JoFetch is [MIT licensed](https://github.com/SNinjo/jo-fetch/blob/main/LICENSE).
+JoFetch is [MIT licensed](./LICENSE).
