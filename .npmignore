@@ -1,4 +1,7 @@
-.github
+/.github
+/coverage
+/node_modules
+
 .babelrc
 .gitignore
 .npmignore
