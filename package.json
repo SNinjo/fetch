@@ -1,6 +1,6 @@
 {
   "name": "jo-fetch",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "JoFetch is a JavaScript tool that provides enhanced fetch functionality.",
   "main": "index.js",
   "scripts": {
