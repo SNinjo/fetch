@@ -34,8 +34,8 @@ npm install jo-fetch
 
 ## API
 #### Integration function (joFetch)
-joFetch(url, parem, config)
-The attributes in parameter config
+joFetch(url, parem, config)  
+The following are the attributes in the parameter config.
 | Attribute   | Type   | Description                                                                  |
 | ----------- | ------ | ---------------------------------------------------------------------------- |
 | loadingTime | number | Define the loading time for this fetch. If the fetch time exceeds this value, this fetch fails and an error is thrown. |

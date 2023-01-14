@@ -1,0 +1,6 @@
+.github
+.babelrc
+.gitignore
+.npmignore
+*.test.js
+*.config.js
