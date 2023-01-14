@@ -53,4 +53,4 @@ The parameters, url and param, are same as window.fetch.
 | fetchAutoRetry(url, param, times, delay) | Promise     | Return the result, and if the fetch fails, automatically retry to fetch within a limited number of times. |
 
 ## License
-JoFetch is MIT licensed.
+JoFetch is [MIT licensed](https://github.com/SNinjo/jo-fetch/blob/main/LICENSE).
