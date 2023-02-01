@@ -60,14 +60,16 @@ export default function joFetch(url, parameter = {}, config = {}){
     // process data type
     switch (config.returnType){
         case 'html':
-            promise
+            promise = promise
                 .then(response => response.text())
                 .then(strHtml => new DOMParser().parseFromString(strHtml, "text/html"))
             break
+
         case 'json':
-            promise
+            promise = promise
                 .then(response => response.json())
             break
+            
         case '':
         default:
             break
