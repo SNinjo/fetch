@@ -409,18 +409,15 @@ describe('test function joFetch', () => {
         await expect(joFetch('', {status: 'error'}, {retryTimes: 0})).rejects.toThrow(new Error())
     })
 
-    test('return html', async () => {
-        let response = await joFetch('', {status: 'html'}, {returnType: 'html'})
-        expect(response.data).toBe(strHTML)
-        expect(response.text()).toBe(strHTML)
-    })
-
     test('return json', async () => {
-        let response = await joFetch('', {status: 'json'}, {returnType: 'json'})
-        expect(response.data).toBe(strJson)
-        expect(response.json()).toEqual(JSON.parse(strJson))
+        expect.assertions(1)
+        await expect(joFetch('', {status: 'json'}, {returnType: 'json'})).resolves.toEqual(JSON.parse(strJson))
     })
 
+    test('return html', async () => {
+        expect.assertions(1)
+        await expect(joFetch('', {status: 'html'}, {returnType: 'html'})).resolves.toEqual(new DOMParser().parseFromString(strHTML, "text/html"))
+    })
 
     describe('fetch in time', () => {
         beforeEach(() => {
