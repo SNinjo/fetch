@@ -1,4 +1,4 @@
-# JoFetch &middot; [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/SNinjo/jo-fetch/blob/main/LICENSE) [![NPM](https://img.shields.io/badge/npm-v1.0.5-blue)](https://www.npmjs.com/package/jo-fetch) [![CI](https://img.shields.io/badge/CI-passing-brightgreen)](https://github.com/SNinjo/jo-fetch/actions/workflows/ci.yml)
+# JoFetch &middot; [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/SNinjo/jo-fetch/blob/master/LICENSE) [![NPM](https://img.shields.io/badge/npm-v1.0.5-blue)](https://www.npmjs.com/package/jo-fetch) [![CI](https://img.shields.io/badge/CI-passing-brightgreen)](https://github.com/SNinjo/jo-fetch/actions/workflows/ci.yml)
 JoFetch is a JavaScript tool that provides enhanced fetch functionality.
 
 There are a lot of functions in this tool, such as simple or integration version.
