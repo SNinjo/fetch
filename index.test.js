@@ -1,9 +1,12 @@
-import joFetch, { fetchJSON, fetchDocument, fetchInTime, fetchAutoRetry } from ".";
+import joFetch, { fetchText, fetchJSON, fetchBlob, fetchDocument, fetchGZip, fetchInTime, fetchAutoRetry } from "./"
+import { Response } from "whatwg-fetch"
 
 
+const strText = 'text'
+const strBlob = 'blob'
 const strJson = '{"num": 1}'
 const strHTML = '<body><h1>text</h1></body>'
-function mockFetch(url, parameter = {}){
+async function mockFetch(url, parameter = {}){
     switch (parameter.status){
         case 'keep loading':
             return new Promise(() => {})
@@ -20,16 +23,40 @@ function mockFetch(url, parameter = {}){
         case 'error':
             return new Promise((resolve, reject) => reject(new Error()))
 
-        case 'html':
+        case 'text':
             return new Promise(resolve => resolve({
-                data: strHTML,
-                text: () => strHTML,
+                data: strText,
+                text: () => strText,
             }))
         case 'json':
             return new Promise(resolve => resolve({
                 data: strJson,
                 json: () => JSON.parse(strJson),
             }))
+        case 'blob':
+            const blob = await new Response(strBlob).blob()
+            return new Promise(resolve => resolve({
+                data: blob,
+                blob: () => blob,
+            }))
+        case 'html':
+            return new Promise(resolve => resolve({
+                data: strHTML,
+                text: () => strHTML,
+            }))
+        // case 'gzip':
+        //     const compressToGZip = (string) => {
+        //         let compressionStream = new CompressionStream('gzip')
+        //         let writer = compressionStream.writable.getWriter();
+        //         writer.write(new TextEncoder().encode(string))
+        //         writer.close()
+        //         return new Response(compressionStream.readable)
+        //     }
+        //     let gzip = compressToGZip(strText)
+        //     return new Promise(resolve => resolve({
+        //         data: gzip,
+        //         blob: () => gzip,
+        //     }))
 
         case '404':
             return new Promise(resolve => resolve(404))
@@ -109,10 +136,10 @@ describe('test function fetch (window.fetch and mockFetch)', () => {
     })
 
 
-    test('return html', async () => {
-        let response = await fetch('', {status: 'html'})
-        expect(response.data).toBe(strHTML)
-        expect(response.text()).toBe(strHTML)
+    test('return text', async () => {
+        let response = await fetch('', {status: 'text'})
+        expect(response.data).toBe(strText)
+        expect(response.text()).toBe(strText)
     })
 
     test('return json', async () => {
@@ -121,6 +148,18 @@ describe('test function fetch (window.fetch and mockFetch)', () => {
         expect(response.json()).toEqual(JSON.parse(strJson))
     })
 
+    test('return blob', async () => {
+        let response = await fetch('', {status: 'blob'})
+        let blob = await new Response(strBlob).blob()
+        expect(response.data).toEqual(blob)
+        expect(response.blob()).toEqual(blob)
+    })
+
+    test('return html', async () => {
+        let response = await fetch('', {status: 'html'})
+        expect(response.data).toBe(strHTML)
+        expect(response.text()).toBe(strHTML)
+    })
 
     test('return 404', async () => {
         expect.assertions(1)
@@ -183,6 +222,18 @@ describe('test function fetch (window.fetch and mockFetch)', () => {
 
 
 
+describe('test function fetchText', () => {
+    test('return text', async () => {
+        expect.assertions(1)
+        await expect(fetchText('', {status: 'text'})).resolves.toEqual(strText)
+    })
+    
+    test('return error', async () => {
+        expect.assertions(1)
+        await expect(fetchText('', {status: 'error'})).rejects.toThrow(new Error())
+    })
+})
+
 describe('test function fetchJSON', () => {
     test('return json', async () => {
         expect.assertions(1)
@@ -192,6 +243,18 @@ describe('test function fetchJSON', () => {
     test('return error', async () => {
         expect.assertions(1)
         await expect(fetchJSON('', {status: 'error'})).rejects.toThrow(new Error())
+    })
+})
+
+describe('test function fetchBlob', () => {
+    test('return blob', async () => {
+        expect.assertions(1)
+        await expect(fetchBlob('', {status: 'blob'})).resolves.toEqual(await new Response(strBlob).blob())
+    })
+    
+    test('return error', async () => {
+        expect.assertions(1)
+        await expect(fetchBlob('', {status: 'error'})).rejects.toThrow(new Error())
     })
 })
 
@@ -205,6 +268,16 @@ describe('test function fetchDocument', () => {
         expect.assertions(1)
         await expect(fetchDocument('', {status: 'error'})).rejects.toThrow(new Error())
     })
+})
+
+describe('test function fetchGZip', () => {
+    // Manual test passed
+    // test('ReferenceError: CompressionStream is not defined', () => {
+    //     console.log(CompressionStream)
+    // })
+    // test('ReferenceError: DecompressionStream is not defined', () => {
+    //     console.log(DecompressionStream)
+    // })
 })
 
 
@@ -409,15 +482,36 @@ describe('test function joFetch', () => {
         await expect(joFetch('', {status: 'error'}, {retryTimes: 0})).rejects.toThrow(new Error())
     })
 
-    test('return json', async () => {
+    test('to text', async () => {
         expect.assertions(1)
-        await expect(joFetch('', {status: 'json'}, {returnType: 'json'})).resolves.toEqual(JSON.parse(strJson))
+        await expect(joFetch('', {status: 'text'}, {typeTo: 'text'})).resolves.toEqual(strText)
     })
 
-    test('return html', async () => {
+    test('to json', async () => {
         expect.assertions(1)
-        await expect(joFetch('', {status: 'html'}, {returnType: 'html'})).resolves.toEqual(new DOMParser().parseFromString(strHTML, "text/html"))
+        await expect(joFetch('', {status: 'json'}, {typeTo: 'json'})).resolves.toEqual(JSON.parse(strJson))
     })
+
+    test('to blob', async () => {
+        expect.assertions(1)
+        await expect(joFetch('', {status: 'blob'}, {typeTo: 'blob'})).resolves.toEqual(await new Response(strBlob).blob())
+    })
+
+    test('to html', async () => {
+        expect.assertions(1)
+        await expect(joFetch('', {status: 'html'}, {typeTo: 'html'})).resolves.toEqual(new DOMParser().parseFromString(strHTML, "text/html"))
+    })
+
+    describe('from GZip', () => {
+        // Manual test passed
+        // test('ReferenceError: CompressionStream is not defined', () => {
+        //     console.log(CompressionStream)
+        // })
+        // test('ReferenceError: DecompressionStream is not defined', () => {
+        //     console.log(DecompressionStream)
+        // })
+    })
+
 
     describe('fetch in time', () => {
         beforeEach(() => {
@@ -542,6 +636,23 @@ describe('test function joFetch', () => {
             test('blockTimes = 6', async () => {
                 await expect(joFetch('', {status: 'block', blockTimes: 6}, {retryTimes: 5, retryDelay: 0})).rejects.toThrow(new Error())
             })
+        })
+    })
+
+
+    describe('deal with error', () => {
+        beforeEach(() => {
+            expect.assertions(1)
+        })
+
+        test('throw error', async () => {
+            await expect(joFetch('', {status: 'error'}, {retryTimes: 0})).rejects.toThrow(new Error())
+        })
+        test('catch error and return -1', async () => {
+            await expect(joFetch('', {status: 'error'}, {retryTimes: 0, useError: (() => -1)})).resolves.toBe(-1)
+        })
+        test('catch error and return empty array', async () => {
+            await expect(joFetch('', {status: 'error'}, {retryTimes: 0, useError: (() => [])})).resolves.toEqual([])
         })
     })
 })
