@@ -50,7 +50,7 @@ export async function fetchAutoRetry(url, parameter, times = 5, delay = 5000) {
 export default async function joFetch(url, parameter, config = {}) {
     // initialize
     const sleep = (time) => new Promise(resolve => setTimeout(resolve, time))
-    config.useError = config.useError ?? ((error) => {throw error})
+    config.useError = config.useError ?? ((error) => { throw error })
     config.loadingTime = config.loadingTime ?? 10000
     config.retryTimes = config.retryTimes ?? 5
     config.retryDelay = config.retryDelay ?? 5000
@@ -73,7 +73,7 @@ export default async function joFetch(url, parameter, config = {}) {
         })
     
     // process data type
-    switch (config.typeFrom){
+    switch (config.typeFrom) {
         case 'gzip':
             promise = promise
                 .then(response => response.blob())
@@ -84,7 +84,7 @@ export default async function joFetch(url, parameter, config = {}) {
         default:
             break
     }
-    switch (config.typeTo){
+    switch (config.typeTo) {
         case 'text':
             promise = promise
                 .then(response => response.text())
