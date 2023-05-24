@@ -8,8 +8,8 @@ import joFetch, {
     fetchInTime,
     fetchAutoRetry,
     combineSignals
-} from "./"
-import { Response } from "whatwg-fetch"
+} from './'
+import { Response } from 'whatwg-fetch'
 
 
 function getResponse200() {
