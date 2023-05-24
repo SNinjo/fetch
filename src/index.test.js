@@ -1,4 +1,14 @@
-import joFetch, { fetchText, fetchJSON, fetchBlob, fetchDocument, fetchGZip, fetchOnlyResponseOk, fetchInTime, fetchAutoRetry, combineSignals } from "./"
+import joFetch, {
+    fetchText,
+    fetchJSON,
+    fetchBlob,
+    fetchDocument,
+    fetchGZip,
+    fetchOnlyResponseOk,
+    fetchInTime,
+    fetchAutoRetry,
+    combineSignals
+} from "./"
 import { Response } from "whatwg-fetch"
 
 
@@ -863,7 +873,7 @@ describe('test function joFetch', () => {
         
         test('catch error', async () => {
             expect.assertions(2)
-            
+
             let controller = new AbortController()
             await expect(joFetch('', {status: 'error', retryTimes: 0, controller: controller})).rejects.toThrow(new Error('mock error'))
             expect(controller.signal.aborted).toBe(true)
