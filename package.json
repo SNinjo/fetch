@@ -1,8 +1,8 @@
 {
   "name": "jo-fetch",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "JoFetch is a JavaScript tool that provides enhanced fetch functionality.",
-  "main": "index.js",
+  "main": "./src/index.js",
   "scripts": {
     "test": "jest",
     "coverage": "jest --collect-coverage"
