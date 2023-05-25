@@ -36,7 +36,7 @@ npm install jo-fetch
 ## API
 #### Integration function (joFetch)
 joFetch(url, param)  
-The following are the additional attributes in the parameter 'param'.
+The following are the additional attributes in the parameter "param".
 | Attribute          | Type     | Description                                                                  |
 | ------------------ | -------- | ---------------------------------------------------------------------------- |
 | loadingTime        | number   | Define the loading time for this fetch. If the fetch time exceeds this value, this fetch fails and an error is thrown. |
