@@ -3,6 +3,7 @@
   "version": "1.0.8",
   "description": "JoFetch is a JavaScript tool that provides enhanced fetch functionality.",
   "main": "./src/index.js",
+  "type": "module",
   "scripts": {
     "test": "jest",
     "coverage": "jest --collect-coverage"
@@ -16,7 +17,11 @@
     "fetcher",
     "function"
   ],
-  "author": "SNinjo",
+  "author": {
+    "name": "SNinjo",
+    "email": "contact@SNinjo.com",
+    "web": "https://SNinjo.com" 
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/SNinjo/fetch/issues"
