@@ -1,9 +1,0 @@
-/.github
-/coverage
-/node_modules
-
-.babelrc
-.gitignore
-.npmignore
-*.test.js
-*.config.js

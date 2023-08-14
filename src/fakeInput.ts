@@ -1,0 +1,1 @@
+// Configurations in rollup.config.js must have an input
