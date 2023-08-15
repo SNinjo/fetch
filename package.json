@@ -12,7 +12,6 @@
         "lint": "eslint src/* --ext .ts",
         "lint:fix": "eslint --fix src/**/*.ts",
         "test": "jest --config=jest.config.json",
-        "test:watch": "jest --watch --config=jest.config.json",
         "coverage": "jest --coverage --config=jest.config.json",
         "test:commonJs": "jest ./src/commonJs/index.test.js --config=commonJs.jest.config.json",
         "test:ECMAScript": "jest ./src/ECMAScript/index.test.js --config=ECMAScript.jest.config.json",

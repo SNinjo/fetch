@@ -9,7 +9,7 @@ const joFetch = module.exports;
 const { fetchInTime, fetchDocument} = module.exports;
 
 
-test('import functions from jo-fetch', () => {
+test('get functions from module.exports', () => {
 	expect(typeof joFetch).toBe('function')
 	expect(typeof fetchDocument).toBe('function')
 	expect(typeof fetchInTime).toBe('function')
