@@ -29,9 +29,9 @@
     },
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/SNinjo/fetch/issues"
+        "url": "https://github.com/SNinjo/jo-fetch/issues"
     },
-    "homepage": "https://github.com/SNinjo/fetch#readme",
+    "homepage": "https://github.com/SNinjo/jo-fetch#readme",
     "files": [
         "build/",
         "README.md",
