@@ -87,7 +87,6 @@ export interface RequestConfig extends RequestInit {
 
 	isBadResponseError?: boolean,
 	onError?: (error: any) => void,
-	controller?: AbortController,
 }
 async function joFetch(url: string, config: RequestConfig = {}): Promise<Response | string | JSON | Blob | Document> {
 	interface RequestParameter extends RequestInit {
@@ -113,9 +112,9 @@ async function joFetch(url: string, config: RequestConfig = {}): Promise<Respons
 
 			isBadResponseError: false,
 			onError: ((error: any) => { throw error }),
-			controller: new AbortController(),
 
-			...config
+			...config,
+			controller: new AbortController(),
 		}
 	}
 
@@ -134,10 +133,9 @@ async function joFetch(url: string, config: RequestConfig = {}): Promise<Respons
       
 		return controller.signal
 	}
-	const fetchInTime = async (url: string, parameter: RequestParameter, time: number): Promise<Response> => {
+	const fetchInTime = async (url: string, parameter: RequestParameter): Promise<Response> => {
 		return new Promise((resolve, reject) => {
-			const timeout = setTimeout(() => reject(new Error('fetch overtime')), time)
-			parameter.signal = parameter.signal? combineSignals([parameter.controller.signal, parameter.signal]) : parameter.controller.signal;
+			const timeout = setTimeout(() => reject(new Error('fetch overtime')), parameter.loadingTime)
 			fetch(url, parameter)
 				.then(resolve)
 				.catch(reject)
@@ -145,7 +143,7 @@ async function joFetch(url: string, config: RequestConfig = {}): Promise<Respons
 		})
 	}
 
-	const processResponse = (response: Response) => {
+	const processResponse = (response: Response): Response => {
 		if (parameter.isBadResponseError && !response.ok) throw new Error(`[HTTP ${response.status}] The response isn't ok.`)
 		return response
 	}
@@ -159,52 +157,53 @@ async function joFetch(url: string, config: RequestConfig = {}): Promise<Respons
 		return joFetch(url, parameter)
 	}
 
-	const processDataType = (promise: Promise<any>) => {
+	const processDataType = async (response: Response) => {
+		let dataFrom: Response;
 		switch (parameter.typeFrom) {
 		// case 'gzip':
-		// 	promise = promise
-		// 		.then(response => response.blob())
-		// 		.then(data => new Response(data.stream().pipeThrough( new DecompressionStream('gzip') )))
+		// 	dataFrom = new Response((await response.blob()).stream().pipeThrough( new DecompressionStream('gzip') ))
 		// 	break
     
 		case '':
 		default:
-			break
+			dataFrom = response
 		}
+
+
+		let dataTo: any;
 		switch (parameter.typeTo) {
 		case 'text':
-			promise = promise
-				.then(response => response.text())
+			dataTo = await dataFrom.text();
 			break
     
 		case 'json':
-			promise = promise
-				.then(response => response.json())
+			dataTo = await dataFrom.json();
 			break
     
 		case 'blob':
-			promise = promise
-				.then(response => response.blob())
+			dataTo = await dataFrom.blob();
 			break
     
 		case 'document':
-			promise = promise
-				.then(response => response.text())
-				.then(strHtml => new DOMParser().parseFromString(strHtml, 'text/html'))
+			dataTo = new DOMParser().parseFromString(await dataFrom.text(), 'text/html')
 			break
                 
 		case '':
 		default:
-			break
+			dataTo = dataFrom
 		}
-		return promise
+		return dataTo
 	}
 
 
 	const parameter = initialize(config)
-	return processDataType(
-		fetchInTime(url, parameter, parameter.loadingTime)
+	return (
+		fetchInTime(url, {
+			...parameter,
+			signal: parameter.signal? combineSignals([parameter.controller.signal, parameter.signal]) : parameter.controller.signal,
+		})
 			.then(processResponse)
+			.then(processDataType)
 			.catch(retryOnFailure)
 	)
 }

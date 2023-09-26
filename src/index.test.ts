@@ -37,6 +37,12 @@ const strJson = '{"num": 1}'
 const strHTML = '<body><h1>text</h1></body>'
 
 async function mockFetch(url: RequestInfo | URL, parameter?: RequestInit): Promise<Response> {
+	if (blockTimes !== 0) {
+		blockTimes--
+		return new Promise((resolve, reject) => reject(new Error('mock blocking')))
+	}
+
+
 	switch (status) {
 	case 'keep loading':
 		return new Promise(() => {})
@@ -57,17 +63,17 @@ async function mockFetch(url: RequestInfo | URL, parameter?: RequestInit): Promi
 				}
 			}
 		})
-	case 'block':
-		if (blockTimes === 0) {
-			setRequestParameter({
-				status: '200',
-			})
-			return mockFetch(url, parameter)
-		}
-		else {
-			blockTimes--
-			return new Promise((resolve, reject) => reject(new Error('mock blocking')))
-		}
+	// case 'block':
+	// 	if (blockTimes === 0) {
+	// 		setRequestParameter({
+	// 			status: '200',
+	// 		})
+	// 		return mockFetch(url, parameter)
+	// 	}
+	// 	else {
+	// 		blockTimes--
+	// 		return new Promise((resolve, reject) => reject(new Error('mock blocking')))
+	// 	}
 	case 'error':
 		return new Promise((resolve, reject) => reject(new Error('mock error')))
 
@@ -149,7 +155,7 @@ describe('test function fetch (window.fetch and mockFetch)', () => {
 			expect.assertions(1)
     
 			setRequestParameter({
-				status: 'block',
+				status: '200',
 				blockTimes: 0,
 			})
 			let response = fetch('')
@@ -162,7 +168,7 @@ describe('test function fetch (window.fetch and mockFetch)', () => {
 			let promise
     
 			setRequestParameter({
-				status: 'block',
+				status: '200',
 				blockTimes: 1,
 			})
 			promise = fetch('')
@@ -179,7 +185,7 @@ describe('test function fetch (window.fetch and mockFetch)', () => {
 			let promise
     
 			setRequestParameter({
-				status: 'block',
+				status: '200',
 				blockTimes: 5,
 			})
 			for (let times = 5; times >= 1; times--) {
@@ -191,6 +197,23 @@ describe('test function fetch (window.fetch and mockFetch)', () => {
 			promise = fetch('')
 			jest.advanceTimersByTime(0)
 			await expect(promise).resolves.toStrictEqual(new Response())
+		})
+
+		test('once and return text', async () => {
+			expect.assertions(3)
+			let promise
+    
+			setRequestParameter({
+				status: 'text',
+				blockTimes: 1,
+			})
+			promise = fetch('')
+			jest.advanceTimersByTime(0)
+			await expect(promise).rejects.toThrow(new Error('mock blocking'))
+            
+			promise = fetch('')
+			await expect(promise).resolves.toStrictEqual(new Response(strText))
+			await expect((await promise).text()).resolves.toBe(strText)
 		})
 	})
 
@@ -630,14 +653,14 @@ describe('test function fetchAutoRetry', () => {
 		describe('zero times', () => {
 			test('blockTimes = 0', async () => {
 				setRequestParameter({
-					status: 'block',
+					status: '200',
 					blockTimes: 0,
 				})
 				await expect(fetchAutoRetry('', {}, 0, 0)).resolves.toStrictEqual(new Response())
 			})
 			test('blockTimes = 1', async () => {
 				setRequestParameter({
-					status: 'block',
+					status: '200',
 					blockTimes: 1,
 				})
 				await expect(fetchAutoRetry('', {}, 0, 0)).rejects.toThrow(new Error('mock blocking'))
@@ -647,14 +670,14 @@ describe('test function fetchAutoRetry', () => {
 		describe('once', () => {
 			test('blockTimes = 1', async () => {
 				setRequestParameter({
-					status: 'block',
+					status: '200',
 					blockTimes: 1,
 				})
 				await expect(fetchAutoRetry('', {}, 1, 0)).resolves.toStrictEqual(new Response())
 			})
 			test('blockTimes = 2', async () => {
 				setRequestParameter({
-					status: 'block',
+					status: '200',
 					blockTimes: 2,
 				})
 				await expect(fetchAutoRetry('', {}, 1, 0)).rejects.toThrow(new Error('mock blocking'))
@@ -664,14 +687,14 @@ describe('test function fetchAutoRetry', () => {
 		describe('five times', () => {
 			test('blockTimes = 5', async () => {
 				setRequestParameter({
-					status: 'block',
+					status: '200',
 					blockTimes: 5,
 				})
 				await expect(fetchAutoRetry('', {}, 5, 0)).resolves.toStrictEqual(new Response())
 			})
 			test('blockTimes = 6', async () => {
 				setRequestParameter({
-					status: 'block',
+					status: '200',
 					blockTimes: 6,
 				})
 				await expect(fetchAutoRetry('', {}, 5, 0)).rejects.toThrow(new Error('mock blocking'))
@@ -853,12 +876,8 @@ describe('test function joFetch', () => {
     
 
 	describe('cancel fetching', () => {
-		beforeEach(() => {
-			expect.assertions(2)
-		})
-
-
 		test('abort signal', async () => {
+			expect.assertions(2)
 			let promise, controller
             
 			controller = new AbortController()
@@ -879,12 +898,11 @@ describe('test function joFetch', () => {
 		})
         
 		test('catch error', async () => {
-			let controller = new AbortController()
+			expect.assertions(1)
 			setRequestParameter({
 				status: 'error',
 			})
-			await expect(joFetch('', {retryTimes: 0, controller: controller})).rejects.toThrow(new Error('mock error'))
-			expect(controller.signal.aborted).toBe(true)
+			await expect(joFetch('', {retryTimes: 0})).rejects.toThrow(new Error('mock error'))
 		})
 	})
 
@@ -1015,14 +1033,14 @@ describe('test function joFetch', () => {
 		describe('zero times', () => {
 			test('blockTimes = 0', async () => {
 				setRequestParameter({
-					status: 'block',
+					status: '200',
 					blockTimes: 0,
 				})
 				await expect(joFetch('', {retryTimes: 0, retryDelay: 0})).resolves.toStrictEqual(new Response())
 			})
 			test('blockTimes = 1', async () => {
 				setRequestParameter({
-					status: 'block',
+					status: '200',
 					blockTimes: 1,
 				})
 				await expect(joFetch('', {retryTimes: 0, retryDelay: 0})).rejects.toThrow(new Error('mock blocking'))
@@ -1032,14 +1050,14 @@ describe('test function joFetch', () => {
 		describe('once', () => {
 			test('blockTimes = 1', async () => {
 				setRequestParameter({
-					status: 'block',
+					status: '200',
 					blockTimes: 1,
 				})
 				await expect(joFetch('', {retryTimes: 1, retryDelay: 0})).resolves.toStrictEqual(new Response())
 			})
 			test('blockTimes = 2', async () => {
 				setRequestParameter({
-					status: 'block',
+					status: '200',
 					blockTimes: 2,
 				})
 				await expect(joFetch('', {retryTimes: 1, retryDelay: 0})).rejects.toThrow(new Error('mock blocking'))
@@ -1049,18 +1067,26 @@ describe('test function joFetch', () => {
 		describe('five times', () => {
 			test('blockTimes = 5', async () => {
 				setRequestParameter({
-					status: 'block',
+					status: '200',
 					blockTimes: 5,
 				})
 				await expect(joFetch('', {retryTimes: 5, retryDelay: 0})).resolves.toStrictEqual(new Response())
 			})
 			test('blockTimes = 6', async () => {
 				setRequestParameter({
-					status: 'block',
+					status: '200',
 					blockTimes: 6,
 				})
 				await expect(joFetch('', {retryTimes: 5, retryDelay: 0})).rejects.toThrow(new Error('mock blocking'))
 			})
+		})
+        
+		test('once and return text', async () => {
+			setRequestParameter({
+				status: 'text',
+				blockTimes: 1,
+			})
+			await expect(joFetch('', {retryTimes: 1, retryDelay: 0, typeTo: 'text'})).resolves.toBe(strText)
 		})
 	})
 
